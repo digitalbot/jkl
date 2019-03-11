@@ -5,13 +5,54 @@
  */
 package com.digitalbot.jkl
 
+import com.github.ajalt.clikt.core.CliktCommand
+import com.github.ajalt.clikt.parameters.arguments.argument
+import com.github.ajalt.clikt.parameters.arguments.convert
+import com.github.ajalt.clikt.parameters.arguments.validate
+import com.github.ajalt.clikt.parameters.options.convert
+import com.github.ajalt.clikt.parameters.options.multiple
+import com.github.ajalt.clikt.parameters.options.option
 import kotlin.system.exitProcess
 
-/** for print messages to stdout with timestamp */
-val datetimeLogger = org.slf4j.LoggerFactory.getLogger("com.digitalbot.jkl.AppKt.datetime")!!
+/**
+ * Jkl - commandline jmx client tool entity.
+ *
+ * @author digitalbot
+ */
+class Jkl : CliktCommand() {
+    /**
+     * requires valid jmx rmi "host:port"
+     */
+    private val hostport by argument("host:port")
+            .convert { toPair(":", it) }
+            .validate { require(it.second.toIntOrNull() != null) }
 
-/** for print only messages to stdout */
-val straightLogger = org.slf4j.LoggerFactory.getLogger("com.digitalbot.jkl.AppKt.straight")!!
+    /**
+     * requires "BEAN\tCOMMAND"
+     */
+    private val targets by option("-t", "--target")
+            .convert { toPair("\t", it) }
+            .multiple()
+
+    private fun toPair(delimiter: String, string: String): Pair<String, String> {
+        val t = string.split(delimiter)
+        return Pair(t[0], t[1])
+    }
+
+    override fun run() {
+        try {
+            val client = JmxClient(hostport.first, hostport.second.toInt())
+            if (targets.isEmpty()) {
+                client.getBeanNames().forEach { echo(it) }
+            } else {
+                TODO("not implemented.")
+            }
+        } catch (e: JmxClientException) {
+            echo(message = e.message, err = true)
+            exitProcess(1)
+        }
+    }
+}
 
 /**
  * Main
@@ -21,12 +62,4 @@ val straightLogger = org.slf4j.LoggerFactory.getLogger("com.digitalbot.jkl.AppKt
  *
  * @author digitalbot
  */
-fun main() {
-    try {
-        val client = JmxClient("", 0)
-        straightLogger.info(client.getBeanNames().toString())
-    } catch (e: JmxClientException) {
-        straightLogger.error(e.message)
-        exitProcess(1)
-    }
-}
+fun main(argv: Array<String>) = Jkl().main(argv)

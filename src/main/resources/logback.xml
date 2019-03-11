@@ -1,32 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE logback>
 <configuration>
-    <appender name="DATETIME" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%d,%m%n</pattern>
-            <charset>UTF8</charset>
-        </encoder>
-    </appender>
-
-    <appender name="STRAIGHT" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder>
-            <pattern>%m%n</pattern>
-            <charset>UTF8</charset>
-        </encoder>
-    </appender>
-
     <appender name="CLIENT_LOG" class="ch.qos.logback.core.ConsoleAppender">
         <encoder>
             <pattern>%d [%t] %p %c{36} - %m%n</pattern>
             <charset>UTF8</charset>
         </encoder>
     </appender>
-
-    <logger name="com.digitalbot.jkl.AppKt.straight" level="INFO" additivity="false">
-        <appender-ref ref="STRAIGHT" />
-    </logger>
-
-    <logger name="com.digitalbot.jkl.AppKt.datetime" level="INFO" additivity="false">
-        <appender-ref ref="DATETIME" />
-    </logger>
 </configuration>
