@@ -6,8 +6,23 @@ import javax.management.MBeanServerConnection
 import javax.management.remote.JMXConnectorFactory
 import javax.management.remote.JMXServiceURL
 
+/**
+ * JmxClient class.
+ *
+ * This class can connect to JMX Service.
+ *
+ * @constructor Primary.
+ *
+ * This Object requires `host` and `port`.
+ * JMX connection is established at the same time as initialization.
+ *
+ * @param host hostname
+ * @param port port number
+ * @throws JmxClientException if invalid host or port specified or connection cannot be made.
+ */
 open class JmxClient(val host: String, val port: Int) {
     companion object {
+        /** static logger */
         @JvmStatic val logger = org.slf4j.LoggerFactory.getLogger(this::class.java.enclosingClass)!!
     }
 
@@ -27,6 +42,12 @@ open class JmxClient(val host: String, val port: Int) {
         logger.debug("INITIALIZING: done.")
     }
 
+    /**
+     * Gets the names of MBeans controlled by the MBean server.
+     *
+     * @return bean names list. This list is sorted by alphabetically.
+     * @throws JmxClientException if cannot get any beans.
+     */
     fun getBeanNames(): List<String> {
         return try {
             logger.debug("GET BEANS: start.")
@@ -40,9 +61,21 @@ open class JmxClient(val host: String, val port: Int) {
         }
     }
 
+    /**
+     * @return "host:port"
+     */
     override fun toString(): String {
         return "$host:$port"
     }
 }
 
+/**
+ * JmxClientException
+ *
+ * This Exception is thrown by JmxClient.
+ *
+ * @constructor
+ * @param message error message
+ * @param cause error cause
+ */
 open class JmxClientException(message: String?, cause: Throwable?) : RuntimeException(message, cause)
