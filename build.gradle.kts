@@ -1,6 +1,7 @@
 plugins {
     id("org.jetbrains.kotlin.jvm").version("1.3.20")
     id("com.github.johnrengelman.shadow").version("5.0.0")
+    id("org.jmailen.kotlinter").version("1.21.0")
     id("org.jetbrains.dokka").version("0.9.17")
     application
 }
