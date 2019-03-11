@@ -1,0 +1,12 @@
+package com.digitalbot.jkl
+
+class App {
+    val greeting: String
+        get() {
+            return "Hello world."
+        }
+}
+
+fun main() {
+    println(App().greeting)
+}

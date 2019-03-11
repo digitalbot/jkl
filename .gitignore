@@ -1,0 +1,25 @@
+# IDE, Editor
+.project
+.classpath
+.checkstyle
+.settings/
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw*
+*.iml
+
+# Ignore Gradle project-specific cache directory
+.gradle
+
+# Ignore Gradle build output directory
+build
+
+# build output directory
+out
+
+# Others
+.DS_Store
