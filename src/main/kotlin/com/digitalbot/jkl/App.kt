@@ -10,6 +10,7 @@ import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.convert
 import com.github.ajalt.clikt.parameters.arguments.validate
 import com.github.ajalt.clikt.parameters.options.convert
+import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import kotlin.system.exitProcess
@@ -34,6 +35,12 @@ class Jkl : CliktCommand() {
             .convert { toPair("\t", it) }
             .multiple()
 
+    /**
+     * Only check client can connect to JMX Server if specified.
+     */
+    private val ping by option("-p", "--ping").flag()
+
+    /** utility... */
     private fun toPair(delimiter: String, string: String): Pair<String, String> {
         val t = string.split(delimiter)
         return Pair(t[0], t[1])
@@ -42,10 +49,10 @@ class Jkl : CliktCommand() {
     override fun run() {
         try {
             val client = JmxClient(hostport.first, hostport.second.toInt())
-            if (targets.isEmpty()) {
-                client.getBeanNames().forEach { echo(it) }
-            } else {
-                TODO("not implemented.")
+            when {
+                ping -> {}   // NOP
+                targets.isEmpty() -> client.getBeanNames().forEach { echo(it) }
+                else -> TODO("not implemented.")
             }
         } catch (e: JmxClientException) {
             echo(message = e.message, err = true)
