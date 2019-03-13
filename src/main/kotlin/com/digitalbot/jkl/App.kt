@@ -46,6 +46,9 @@ class Jkl : CliktCommand() {
         return Pair(t[0], t[1])
     }
 
+    /**
+     * Implementation of CLI application.
+     */
     override fun run() {
         try {
             JmxClient(hostport.first, hostport.second.toInt()).use { client ->
