@@ -70,4 +70,46 @@ class JmxClientTest {
             assert(it.getBeanNames().isNotEmpty())
         }
     }
+
+    @Test
+    fun getAttributeNamesTest() {
+        JmxClient(HOST, PORT).use { client ->
+            // jvm11
+            val memoryAttributes = setOf(
+                    "Verbose",
+                    "ObjectPendingFinalizationCount",
+                    "HeapMemoryUsage",
+                    "NonHeapMemoryUsage",
+                    "ObjectName"
+            )
+
+            expect(memoryAttributes) {
+                client.getAttributeNames("java.lang:type=Memory").toSet()
+            }
+        }
+    }
+
+    @Test
+    fun getValuesTest() {
+        JmxClient(HOST, PORT).use { client ->
+            val memoryValues = client.getValues(
+                    "java.lang:type=Memory",
+                    "HeapMemoryUsage"
+            )
+            expect(4) { memoryValues.size }
+            expect("java.lang:type=Memory") { memoryValues[0].beanName }
+            expect("HeapMemoryUsage") { memoryValues[0].attributeName }
+            expect("committed") { memoryValues[0].type }
+            expect("java.lang:type=Memory") { memoryValues[1].beanName }
+            expect("HeapMemoryUsage") { memoryValues[1].attributeName }
+            expect("init") { memoryValues[1].type }
+            expect("java.lang:type=Memory") { memoryValues[2].beanName }
+            expect("HeapMemoryUsage") { memoryValues[2].attributeName }
+            expect("max") { memoryValues[2].type }
+            expect("java.lang:type=Memory") { memoryValues[3].beanName }
+            expect("HeapMemoryUsage") { memoryValues[3].attributeName }
+            expect("used") { memoryValues[3].type }
+        }
+    }
+
 }

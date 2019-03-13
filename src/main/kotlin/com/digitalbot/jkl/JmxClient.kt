@@ -2,7 +2,13 @@ package com.digitalbot.jkl
 
 import java.io.IOException
 import java.net.MalformedURLException
+import javax.management.AttributeNotFoundException
+import javax.management.InstanceNotFoundException
+import javax.management.MBeanInfo
 import javax.management.MBeanServerConnection
+import javax.management.MalformedObjectNameException
+import javax.management.ObjectName
+import javax.management.openmbean.CompositeDataSupport
 import javax.management.remote.JMXConnector
 import javax.management.remote.JMXConnectorFactory
 import javax.management.remote.JMXServiceURL
@@ -61,6 +67,83 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
             result ?: emptyList()
         } catch (e: IOException) {
             throw JmxClientException("Cannot retrieve mbean.", e)
+        }
+    }
+
+    /**
+     * Gets attributes name list of MBean.
+     *
+     * @param name bean name.
+     * @return MBeanInfo.attributes.name (a.k.a. command) list.
+     * @throws JmxClientException if cannot get command list.
+     */
+    fun getAttributeNames(name: String): List<String> {
+        val info = getMBeanInfo(name)
+        logger.debug("GET BEANS ATTRIBUTES: start.")
+        val result = info.attributes.map { it.name }.toList()
+        logger.debug("GET BEANS ATTRIBUTES: {}.", result)
+        logger.debug("GET BEANS ATTRIBUTES: end.")
+        return result
+    }
+
+    /**
+     * Gets attribute values.
+     *
+     * @param beanName bean name.
+     * @param attributeName attribute name.
+     * @return values includes { beanName, attributeName, type, value }
+     * @throws JmxClientException if cannot get value.
+     */
+    fun getValues(beanName: String, attributeName: String): List<AttributeValue> {
+        val mbsc = mbsc()
+        val objectName = toObjectName(beanName)
+        try {
+            logger.debug("GET VALUE: start.")
+            val value = mbsc.getAttribute(objectName, attributeName)
+            logger.debug("GET VALUE: {}.", value)
+            val result = when (value) {
+                is CompositeDataSupport -> value.compositeType.keySet()
+                        .sorted()
+                        .map { AttributeValue(beanName, attributeName, it, "${value.get(it)}") }
+                        .toList()
+                is Array<*> -> value
+                        .mapIndexed { index, any -> AttributeValue(beanName, attributeName, "$index", "$any") }
+                        .toList()
+                else -> listOf(AttributeValue(beanName, attributeName, "$value"))
+            }
+            logger.debug("GET VALUE: end.")
+            return result
+        } catch (e: InstanceNotFoundException) {
+            throw JmxClientException("Invalid mbean name specified ($beanName).", e)
+        } catch (e: AttributeNotFoundException) {
+            throw JmxClientException("Invalid attribute name specified ($beanName::$attributeName).", e)
+        } catch (e: Exception) {
+            throw JmxClientException("Cannot retrieve value ($beanName::$attributeName).", e)
+        }
+    }
+
+
+    private fun getMBeanInfo(name: String): MBeanInfo {
+        val mbsc = mbsc()
+        val objectName = toObjectName(name)
+        try {
+            logger.debug("GET BEAN INFO: start.")
+            val result = mbsc.getMBeanInfo(objectName)
+            logger.debug("GET BEAN INFO: {}.", result)
+            logger.debug("GET BEAN INFO: end.")
+            return result
+        } catch (e: InstanceNotFoundException) {
+            throw JmxClientException("Invalid mbean name specified ($name).", e)
+        } catch (e: Exception) {
+            throw JmxClientException("Cannot retrieve mbean ($name).", e)
+        }
+    }
+
+    private fun toObjectName(name: String): ObjectName {
+        try {
+            return ObjectName(name)
+        } catch (e: MalformedObjectNameException) {
+            throw JmxClientException("Invalid mbean name specified ($name).", e)
         }
     }
 
