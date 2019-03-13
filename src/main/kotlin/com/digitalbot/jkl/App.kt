@@ -48,11 +48,12 @@ class Jkl : CliktCommand() {
 
     override fun run() {
         try {
-            val client = JmxClient(hostport.first, hostport.second.toInt())
-            when {
-                ping -> {}   // NOP
-                targets.isEmpty() -> client.getBeanNames().forEach { echo(it) }
-                else -> TODO("not implemented.")
+            JmxClient(hostport.first, hostport.second.toInt()).use { client ->
+                when {
+                    ping -> {}   // NOP
+                    targets.isEmpty() -> client.getBeanNames().forEach { echo(it) }
+                    else -> TODO("not implemented.")
+                }
             }
         } catch (e: JmxClientException) {
             echo(message = e.message, err = true)
