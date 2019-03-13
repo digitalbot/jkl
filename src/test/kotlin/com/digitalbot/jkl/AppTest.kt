@@ -1,5 +1,7 @@
 package com.digitalbot.jkl
 
+import org.junit.AfterClass
+import org.junit.BeforeClass
 import org.junit.Test
 import java.lang.management.ManagementFactory
 import java.rmi.registry.LocateRegistry
@@ -7,8 +9,6 @@ import java.security.Permission
 import javax.management.remote.JMXConnectorServer
 import javax.management.remote.JMXConnectorServerFactory
 import javax.management.remote.JMXServiceURL
-import kotlin.test.AfterTest
-import kotlin.test.BeforeTest
 import kotlin.test.expect
 
 /**
@@ -28,39 +28,42 @@ class AppTest {
         }
     }
 
-    /** jmx port */
-    private val port = 10001
+    companion object {
+        /** jmx PORT */
+        private const val PORT = 10001
 
-    /** test jmx server */
-    private var jmxServer : JMXConnectorServer? = null
+        /** test jmx server */
+        private var jmxServer : JMXConnectorServer? = null
 
+        /**
+         * Set up trapping System.exit(?) and JMX Server.
+         */
+        @BeforeClass
+        @JvmStatic
+        fun before() {
+            System.setSecurityManager(NoExitManager())
 
-    /**
-     * Set up trapping System.exit(?) and JMX Server.
-     */
-    @BeforeTest
-    fun before() {
-        System.setSecurityManager(NoExitManager())
+            val location = "service:jmx:rmi:///jndi/rmi://localhost:$PORT/jmxrmi"
+            println("start jmx server ($location).")
+            LocateRegistry.createRegistry(PORT)
+            jmxServer = JMXConnectorServerFactory.newJMXConnectorServer(
+                    JMXServiceURL(location),
+                    null,
+                    ManagementFactory.getPlatformMBeanServer())
+            jmxServer?.start()
+            println("jmx server is started.")
+        }
 
-        val location = "service:jmx:rmi:///jndi/rmi://localhost:$port/jmxrmi"
-        println("start jmx server ($location).")
-        LocateRegistry.createRegistry(port)
-        jmxServer = JMXConnectorServerFactory.newJMXConnectorServer(
-                JMXServiceURL(location),
-                null,
-                ManagementFactory.getPlatformMBeanServer())
-        jmxServer?.start()
-        println("jmx server is started.")
-    }
-
-    /**
-     * shutdown JMX Server.
-     */
-    @AfterTest
-    fun after() {
-        println("stop jmx server.")
-        jmxServer?.stop()
-        println("jmx server is stopped.")
+        /**
+         * shutdown JMX Server.
+         */
+        @AfterClass
+        @JvmStatic
+        fun after() {
+            println("stop jmx server.")
+            jmxServer?.stop()
+            println("jmx server is stopped.")
+        }
     }
 
 
@@ -107,7 +110,7 @@ class AppTest {
         expect(0) {
             try {
                 // use ping option
-                Jkl().main(arrayOf("localhost:$port", "-p"))
+                Jkl().main(arrayOf("localhost:$PORT", "-p"))
                 0
             } catch (e: ExitException) {
                 e.state
