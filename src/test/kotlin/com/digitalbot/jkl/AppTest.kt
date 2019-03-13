@@ -2,13 +2,13 @@ package com.digitalbot.jkl
 
 import org.junit.AfterClass
 import org.junit.BeforeClass
-import org.junit.Test
 import java.lang.management.ManagementFactory
 import java.rmi.registry.LocateRegistry
 import java.security.Permission
 import javax.management.remote.JMXConnectorServer
 import javax.management.remote.JMXConnectorServerFactory
 import javax.management.remote.JMXServiceURL
+import kotlin.test.Test
 import kotlin.test.expect
 
 /**
@@ -55,7 +55,7 @@ class AppTest {
         }
 
         /**
-         * shutdown JMX Server.
+         * Shutdown JMX Server.
          */
         @AfterClass
         @JvmStatic
