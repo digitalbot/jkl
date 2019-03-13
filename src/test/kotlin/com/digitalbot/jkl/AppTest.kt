@@ -33,7 +33,7 @@ class AppTest {
         private const val PORT = 10001
 
         /** test jmx server */
-        private var jmxServer : JMXConnectorServer? = null
+        private var jmxServer: JMXConnectorServer? = null
 
         /**
          * Set up trapping System.exit(?) and JMX Server.

@@ -28,7 +28,7 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
     }
 
     /** connection */
-    private val jmxConnection : JMXConnector
+    private val jmxConnection: JMXConnector
 
     init {
         logger.debug("INITIALIZING: start \"{}:{}\".", host, port)
@@ -51,9 +51,10 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
      * @throws JmxClientException if cannot get any beans.
      */
     fun getBeanNames(): List<String> {
+        val mbsc = mbsc()
         return try {
             logger.debug("GET BEANS: start.")
-            val set = mbsc().queryNames(null, null)
+            val set = mbsc.queryNames(null, null)
             logger.debug("GET BEANS: done.")
             val result = set?.map { it.toString() }?.sorted()?.toList()
             logger.debug("GET BEANS: {}", result?.toString())
@@ -64,7 +65,11 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
     }
 
     private fun mbsc() : MBeanServerConnection {
-        return jmxConnection.mBeanServerConnection
+        try {
+            return jmxConnection.mBeanServerConnection
+        } catch (e: IOException) {
+            throw JmxClientException("Cannot connect bean server.", e)
+        }
     }
 
     /**
