@@ -4,6 +4,8 @@ import org.junit.AfterClass
 import org.junit.BeforeClass
 import java.lang.management.ManagementFactory
 import java.rmi.registry.LocateRegistry
+import java.rmi.registry.Registry
+import java.rmi.server.UnicastRemoteObject
 import javax.management.remote.JMXConnectorServer
 import javax.management.remote.JMXConnectorServerFactory
 import javax.management.remote.JMXServiceURL
@@ -22,6 +24,7 @@ class JmxClientTest {
 
         /** test jmx server */
         private var jmxServer: JMXConnectorServer? = null
+        private var registry: Registry? = null
 
         /**
          * Set up JMX Server.
@@ -31,12 +34,14 @@ class JmxClientTest {
         fun before() {
             val location = "service:jmx:rmi:///jndi/rmi://$HOST:$PORT/jmxrmi"
             println("start jmx server ($location).")
-            LocateRegistry.createRegistry(PORT)
+
+            registry = LocateRegistry.createRegistry(PORT)
             jmxServer = JMXConnectorServerFactory.newJMXConnectorServer(
                     JMXServiceURL(location),
                     null,
                     ManagementFactory.getPlatformMBeanServer())
             jmxServer?.start()
+
             println("jmx server is started.")
         }
 
@@ -48,6 +53,9 @@ class JmxClientTest {
         fun after() {
             println("stop jmx server.")
             jmxServer?.stop()
+            if (registry != null) {
+                UnicastRemoteObject.unexportObject(registry, true)
+            }
             println("jmx server is stopped.")
         }
     }

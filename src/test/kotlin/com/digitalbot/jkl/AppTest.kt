@@ -4,6 +4,8 @@ import org.junit.AfterClass
 import org.junit.BeforeClass
 import java.lang.management.ManagementFactory
 import java.rmi.registry.LocateRegistry
+import java.rmi.registry.Registry
+import java.rmi.server.UnicastRemoteObject
 import java.security.Permission
 import javax.management.remote.JMXConnectorServer
 import javax.management.remote.JMXConnectorServerFactory
@@ -34,6 +36,7 @@ class AppTest {
 
         /** test jmx server */
         private var jmxServer: JMXConnectorServer? = null
+        private var registry: Registry? = null
 
         /**
          * Set up trapping System.exit(?) and JMX Server.
@@ -45,12 +48,14 @@ class AppTest {
 
             val location = "service:jmx:rmi:///jndi/rmi://localhost:$PORT/jmxrmi"
             println("start jmx server ($location).")
-            LocateRegistry.createRegistry(PORT)
+
+            registry = LocateRegistry.createRegistry(PORT)
             jmxServer = JMXConnectorServerFactory.newJMXConnectorServer(
                     JMXServiceURL(location),
                     null,
                     ManagementFactory.getPlatformMBeanServer())
             jmxServer?.start()
+            
             println("jmx server is started.")
         }
 
@@ -62,6 +67,9 @@ class AppTest {
         fun after() {
             println("stop jmx server.")
             jmxServer?.stop()
+            if (registry != null) {
+                UnicastRemoteObject.unexportObject(registry, true)
+            }
             println("jmx server is stopped.")
         }
     }
