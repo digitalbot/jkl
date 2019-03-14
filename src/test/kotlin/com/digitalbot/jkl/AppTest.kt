@@ -55,7 +55,7 @@ class AppTest {
                     null,
                     ManagementFactory.getPlatformMBeanServer())
             jmxServer?.start()
-            
+
             println("jmx server is started.")
         }
 
@@ -73,7 +73,6 @@ class AppTest {
             println("jmx server is stopped.")
         }
     }
-
 
     // === TESTS ===
 

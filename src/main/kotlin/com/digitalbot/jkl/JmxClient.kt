@@ -122,7 +122,6 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
         }
     }
 
-
     private fun getMBeanInfo(name: String): MBeanInfo {
         val mbsc = mbsc()
         val objectName = toObjectName(name)
@@ -147,7 +146,7 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
         }
     }
 
-    private fun mbsc() : MBeanServerConnection {
+    private fun mbsc(): MBeanServerConnection {
         try {
             return jmxConnection.mBeanServerConnection
         } catch (e: IOException) {

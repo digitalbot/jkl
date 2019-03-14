@@ -60,7 +60,6 @@ class JmxClientTest {
         }
     }
 
-
     // === TEST ===
 
     @Test
@@ -119,5 +118,4 @@ class JmxClientTest {
             expect("used") { memoryValues[3].type }
         }
     }
-
 }

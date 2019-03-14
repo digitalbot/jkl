@@ -53,8 +53,11 @@ class Jkl : CliktCommand() {
         try {
             JmxClient(hostport.first, hostport.second.toInt()).use { client ->
                 when {
-                    ping -> {}   // NOP
+                    // do nothing
+                    ping -> true
+                    // show all beans
                     targets.isEmpty() -> client.getBeanNames().forEach { echo(it) }
+                    // ...
                     else -> TODO("not implemented.")
                 }
             }

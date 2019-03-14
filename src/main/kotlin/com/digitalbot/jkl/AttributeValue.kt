@@ -11,12 +11,7 @@ package com.digitalbot.jkl
  * @param type attribute child. This is using on composite data.
  * @param value value
   */
-data class AttributeValue(
-        val beanName: String,
-        val attributeName: String,
-        val type: String?,
-        val value: String
-) {
+data class AttributeValue(val beanName: String, val attributeName: String, val type: String?, val value: String) {
     /**
      * Secondary
      *
@@ -26,9 +21,5 @@ data class AttributeValue(
      * @param attributeName attribute name
      * @param value value
      */
-    constructor(
-            beanName: String,
-            attributeName: String,
-            value: String
-    ): this(beanName, attributeName, null, value)
+    constructor(beanName: String, attributeName: String, value: String) : this(beanName, attributeName, null, value)
 }
