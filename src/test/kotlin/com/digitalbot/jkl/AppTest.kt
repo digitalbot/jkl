@@ -138,6 +138,30 @@ class AppTest {
     }
 
     @Test
+    fun testBeanArgument() {
+        expect(0) {
+            try {
+                Jkl().main(arrayOf("localhost:$PORT", "--", "java.lang:type=Memory"))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
+
+    @Test
+    fun testFullArguments() {
+        expect(0) {
+            try {
+                Jkl().main(arrayOf("localhost:$PORT", "--", "java.lang:type=Memory", "HeapMemoryUsage"))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
+
+    @Test
     fun testSimpleTarget() {
         expect(0) {
             try {

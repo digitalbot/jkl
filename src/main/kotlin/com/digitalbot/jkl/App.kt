@@ -29,6 +29,16 @@ class Jkl : CliktCommand() {
             .validate { require(it.second.toIntOrNull() != null) }
 
     /**
+     * bean name
+     */
+    private val bean by argument().optional()
+
+    /**
+     * attribute name
+     */
+    private val attribute by argument().optional()
+
+    /**
      * requires "BEAN\tCOMMAND"
      */
     private val targets by option("-t", "--target")
@@ -44,11 +54,30 @@ class Jkl : CliktCommand() {
      * Implementation of CLI application.
      */
     override fun run() {
+        // validate. correlation check.
+        if ((attribute ?: bean) != null && targets.isNotEmpty()) {
+            echo(message = "Cannot specify BEAN or ATTRIBUTE argument with '--targets' option.", err = true)
+            exitProcess(1)
+        }
         try {
             JmxClient(hostport.first, hostport.second.toInt()).use { client ->
                 when {
                     // do nothing
                     ping -> true
+
+                    // bean and attribute arguments
+                    bean != null -> {
+                        if (attribute != null) {
+                            // show values
+                            val values = client.getValues(bean!!, attribute!!)
+                            val result = values.map { it.value }
+                            echo(result.joinToString(","))
+                        } else {
+                            // show attribute list
+                            val attributeNames = client.getAttributeNames(bean!!)
+                            attributeNames.forEach { echo(it) }
+                        }
+                    }
                     // show values
                     targets.isNotEmpty() -> {
                         val values = targets.map { client.getValues(it.first, it.second) }.flatten()
