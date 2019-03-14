@@ -8,6 +8,7 @@ package com.digitalbot.jkl
 import com.github.ajalt.clikt.core.CliktCommand
 import com.github.ajalt.clikt.parameters.arguments.argument
 import com.github.ajalt.clikt.parameters.arguments.convert
+import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.arguments.validate
 import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.flag
@@ -51,6 +52,11 @@ class Jkl : CliktCommand() {
     private val ping by option("-p", "--ping").flag()
 
     /**
+     * Show header. Only can specify with returning value calling.
+     */
+    private val showHeader by option("--show-header").flag()
+
+    /**
      * Implementation of CLI application.
      */
     override fun run() {
@@ -59,6 +65,11 @@ class Jkl : CliktCommand() {
             echo(message = "Cannot specify BEAN or ATTRIBUTE argument with '--targets' option.", err = true)
             exitProcess(1)
         }
+        if (showHeader && (attribute == null && targets.isEmpty())) {
+            echo(message = "Cannot specify '--show-header' without attribute or '--targets' option.", err = true)
+            exitProcess(1)
+        }
+
         try {
             JmxClient(hostport.first, hostport.second.toInt()).use { client ->
                 when {
@@ -70,6 +81,10 @@ class Jkl : CliktCommand() {
                         if (attribute != null) {
                             // show values
                             val values = client.getValues(bean!!, attribute!!)
+                            if (showHeader) {
+                                val headers = values.map { it.getHeader() }
+                                echo(headers.joinToString(","))
+                            }
                             val result = values.map { it.value }
                             echo(result.joinToString(","))
                         } else {
@@ -78,12 +93,18 @@ class Jkl : CliktCommand() {
                             attributeNames.forEach { echo(it) }
                         }
                     }
+
                     // show values
                     targets.isNotEmpty() -> {
                         val values = targets.map { client.getValues(it.first, it.second) }.flatten()
+                        if (showHeader) {
+                            val headers = values.map { it.getHeader() }
+                            echo(headers.joinToString(","))
+                        }
                         val result = values.map { it.value }
                         echo(result.joinToString(","))
                     }
+
                     // show all beans
                     else -> {
                         client.getBeanNames().forEach { echo(it) }

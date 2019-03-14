@@ -162,10 +162,63 @@ class AppTest {
     }
 
     @Test
+    fun testFullArgumentsWithHeaders() {
+        expect(0) {
+            try {
+                Jkl().main(arrayOf("localhost:$PORT", "--show-header", "--", "java.lang:type=Memory", "HeapMemoryUsage"))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
+
+    @Test
     fun testSimpleTarget() {
         expect(0) {
             try {
                 Jkl().main(arrayOf("localhost:$PORT", "-t=java.lang:type=Memory\tHeapMemoryUsage"))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
+
+    @Test
+    fun testMultiTargetsWithHeaders() {
+        expect(0) {
+            try {
+                Jkl().main(arrayOf(
+                        "localhost:$PORT",
+                        "--show-header",
+                        "-t=java.lang:type=Memory\tHeapMemoryUsage",
+                        "-t=java.lang:type=GarbageCollector,name=G1 Young Generation\tCollectionCount"
+                ))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
+
+    @Test
+    fun testInvalidTarget() {
+        expect(1) {
+            try {
+                Jkl().main(arrayOf("localhost:$PORT", "--show-header", "-t=java.lang:type=Memory\tHeapMemoryUsage", "--", "java.lang:type=Memory"))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
+
+    @Test
+    fun testInvalidShowHeader() {
+        expect(1) {
+            try {
+                Jkl().main(arrayOf("localhost:$PORT", "--show-header", "--", "java.lang:type=Memory"))
                 0
             } catch (e: ExitException) {
                 e.state

@@ -22,4 +22,14 @@ data class AttributeValue(val beanName: String, val attributeName: String, val t
      * @param value value
      */
     constructor(beanName: String, attributeName: String, value: String) : this(beanName, attributeName, null, value)
+
+    /**
+     * Gets attribute header.
+     *
+     * @return header (beanName, attributeName (and type) joined by "::")
+     */
+    fun getHeader(): String {
+        val str = "$beanName::$attributeName"
+        return if (type == null) "\"$str\"" else "\"$str::$type\""
+    }
 }
