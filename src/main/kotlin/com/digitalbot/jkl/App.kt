@@ -24,7 +24,7 @@ class Jkl : CliktCommand() {
     /**
      * requires valid jmx rmi "host:port"
      */
-    private val hostport by argument("host:port")
+    private val hostport by argument("HOST:PORT")
             .convert { it.split(":").let { t -> Pair(t[0], t[1]) } }
             .validate { require(it.second.toIntOrNull() != null) }
 
@@ -49,13 +49,15 @@ class Jkl : CliktCommand() {
                 when {
                     // do nothing
                     ping -> true
-                    // show all beans
-                    targets.isEmpty() -> client.getBeanNames().forEach { echo(it) }
                     // show values
-                    else -> {
-                        val values = targets.map { client.getValues(it.first, it.second) }
-                        val result = values.flatten().map { it.value }
+                    targets.isNotEmpty() -> {
+                        val values = targets.map { client.getValues(it.first, it.second) }.flatten()
+                        val result = values.map { it.value }
                         echo(result.joinToString(","))
+                    }
+                    // show all beans
+                    else -> {
+                        client.getBeanNames().forEach { echo(it) }
                     }
                 }
             }
