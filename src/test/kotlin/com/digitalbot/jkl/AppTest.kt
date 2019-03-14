@@ -124,4 +124,16 @@ class AppTest {
             }
         }
     }
+
+    @Test
+    fun testSimpleTarget() {
+        expect(0) {
+            try {
+                Jkl().main(arrayOf("localhost:$PORT", "-t=java.lang:type=Memory\tHeapMemoryUsage"))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
 }

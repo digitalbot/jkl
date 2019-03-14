@@ -51,8 +51,12 @@ class Jkl : CliktCommand() {
                     ping -> true
                     // show all beans
                     targets.isEmpty() -> client.getBeanNames().forEach { echo(it) }
-                    // ...
-                    else -> TODO("not implemented.")
+                    // show values
+                    else -> {
+                        val values = targets.map { client.getValues(it.first, it.second) }
+                        val result = values.flatten().map { it.value }
+                        echo(result.joinToString(","))
+                    }
                 }
             }
         } catch (e: JmxClientException) {
