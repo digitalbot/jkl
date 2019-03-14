@@ -25,26 +25,20 @@ class Jkl : CliktCommand() {
      * requires valid jmx rmi "host:port"
      */
     private val hostport by argument("host:port")
-            .convert { toPair(":", it) }
+            .convert { it.split(":").let { t -> Pair(t[0], t[1]) } }
             .validate { require(it.second.toIntOrNull() != null) }
 
     /**
      * requires "BEAN\tCOMMAND"
      */
     private val targets by option("-t", "--target")
-            .convert { toPair("\t", it) }
+            .convert { it.replace("\\t", "\t").split("\t").let { t -> Pair(t[0], t[1]) } }
             .multiple()
 
     /**
      * Only check client can connect to JMX Server if specified.
      */
     private val ping by option("-p", "--ping").flag()
-
-    /** utility... */
-    private fun toPair(delimiter: String, string: String): Pair<String, String> {
-        val t = string.split(delimiter)
-        return Pair(t[0], t[1])
-    }
 
     /**
      * Implementation of CLI application.
