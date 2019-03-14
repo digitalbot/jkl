@@ -89,6 +89,18 @@ class AppTest {
     }
 
     @Test
+    fun testHelp() {
+        expect(0) {
+            try {
+                Jkl().main(arrayOf("-h"))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
+
+    @Test
     fun testInvalidHostport() {
         expect(1) {
             try {
