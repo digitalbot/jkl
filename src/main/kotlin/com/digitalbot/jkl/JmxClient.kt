@@ -139,12 +139,8 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
      * @return values includes { beanName, attributeName, type, value }
      * @throws JmxClientException if cannot get values.
      */
-    fun getValues(beanName: String, attributeName: String, type: String?): List<AttributeValue> {
-        val result = getValues(beanName, attributeName).filter { type == null || type.isBlank() || it.type == type }
-        if (result.isEmpty()) {
-            throw JmxClientException("Invalid type specified ($beanName::$attributeName::$type).")
-        }
-        return result
+    fun getValue(beanName: String, attributeName: String, type: String): AttributeValue {
+        return getValues(beanName, attributeName).firstOrNull { it.type == type } ?: throw JmxClientException("Invalid type specified ($beanName::$attributeName::$type).")
     }
 
     /**
@@ -176,11 +172,11 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
      *   If this parameter is specified null, blank or not specified, a filter will not be applied.
      * @return values includes { beanName, attributeName, type, value }
      */
-    fun getValuesOrNull(beanName: String, attributeName: String, type: String?): List<AttributeValue?> {
+    fun getValueOrNull(beanName: String, attributeName: String, type: String): AttributeValue? {
         return try {
-            getValues(beanName, attributeName, type)
+            getValue(beanName, attributeName, type)
         } catch (e: Exception) {
-            listOf(null)
+            null
         }
     }
 

@@ -10,6 +10,7 @@ import javax.management.remote.JMXConnectorServer
 import javax.management.remote.JMXConnectorServerFactory
 import javax.management.remote.JMXServiceURL
 import kotlin.test.Test
+import kotlin.test.assertNull
 import kotlin.test.expect
 
 /**
@@ -131,15 +132,14 @@ class JmxClientTest {
     @Test
     fun getValuesWithTypeTest() {
         JmxClient(HOST, PORT).use { client ->
-            val memoryValues = client.getValues(
+            val memoryValue = client.getValue(
                     "java.lang:type=Memory",
                     "HeapMemoryUsage",
                     "init"
             )
-            expect(1) { memoryValues.size }
-            expect("java.lang:type=Memory") { memoryValues[0].beanName }
-            expect("HeapMemoryUsage") { memoryValues[0].attributeName }
-            expect("init") { memoryValues[0].type }
+            expect("java.lang:type=Memory") { memoryValue.beanName }
+            expect("HeapMemoryUsage") { memoryValue.attributeName }
+            expect("init") { memoryValue.type }
         }
     }
 
@@ -147,7 +147,7 @@ class JmxClientTest {
     fun getValuesWithInvalidTypeTest() {
         try {
             JmxClient(HOST, PORT).use { client ->
-                client.getValues(
+                client.getValue(
                         "java.lang:name=G1 Old Generation,type=GarbageCollector",
                         "CollectionCount",
                         "foo"
@@ -163,13 +163,12 @@ class JmxClientTest {
     @Test
     fun getValuesOrNullWithInvalidTypeTest() {
         JmxClient(HOST, PORT).use { client ->
-            val noValues = client.getValuesOrNull(
+            val value = client.getValueOrNull(
                     "java.lang:name=G1 Old Generation,type=GarbageCollector",
                     "CollectionCount",
                     "foo"
             )
-            expect(1) { noValues.size }
-            expect(0) { noValues.filter { it != null }.size }
+            assertNull(value)
         }
     }
 }

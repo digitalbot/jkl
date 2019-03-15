@@ -227,10 +227,34 @@ class AppTest {
     }
 
     @Test
-    fun invalidTargetTest() {
+    fun invalidArgumentAndTargetTest() {
         expect(1) {
             try {
                 Jkl().main(arrayOf("localhost:$PORT", "--show-header", "-t=java.lang:type=Memory\tHeapMemoryUsage", "--", "java.lang:type=Memory"))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
+
+    @Test
+    fun invalidTargetTest() {
+        expect(1) {
+            try {
+                Jkl().main(arrayOf("localhost:$PORT", "--show-header", "-t=java.lang:type=Memory"))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
+
+    @Test
+    fun invalidMultiTargetsTest() {
+        expect(0) {
+            try {
+                Jkl().main(arrayOf("localhost:$PORT", "--show-header", "-t=foo\tbar", "-t=bar\tbaz"))
                 0
             } catch (e: ExitException) {
                 e.state

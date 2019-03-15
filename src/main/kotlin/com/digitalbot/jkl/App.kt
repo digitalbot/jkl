@@ -85,13 +85,21 @@ class Jkl : CliktCommand() {
                     bean != null -> {
                         if (attribute != null) {
                             // show values
-                            val values = client.getValues(bean!!, attribute!!, type)
-                            if (showHeader) {
-                                val headers = values.map { it.getHeader() }
-                                echo(headers.joinToString(","))
+                            if (type != null) {
+                                val result = client.getValue(bean!!, attribute!!, type!!)
+                                if (showHeader) {
+                                    echo(result.getHeader())
+                                }
+                                echo(result.value)
+                            } else {
+                                val values = client.getValues(bean!!, attribute!!)
+                                if (showHeader) {
+                                    val headers = values.map { it.getHeader() }
+                                    echo(headers.joinToString(","))
+                                }
+                                val result = values.map { it.value }
+                                echo(result.joinToString(","))
                             }
-                            val result = values.map { it.value }
-                            echo(result.joinToString(","))
                         } else {
                             // show attribute list
                             val attributeNames = client.getAttributeNames(bean!!)
@@ -101,12 +109,20 @@ class Jkl : CliktCommand() {
 
                     // show values
                     targets.isNotEmpty() -> {
-                        val values = targets.map { client.getValues(it[0], it[1], it.getOrNull(3)) }.flatten()
+                        val values = targets
+                                .map {
+                                    if (it.size == 3) {
+                                        listOf(client.getValueOrNull(it[0], it[1], it[2]))
+                                    } else {
+                                        client.getValuesOrNull(it[0], it[1])
+                                    }
+                                }
+                                .flatten()
                         if (showHeader) {
-                            val headers = values.map { it.getHeader() }
+                            val headers = values.map { it?.getHeader() ?: "" }
                             echo(headers.joinToString(","))
                         }
-                        val result = values.map { it.value }
+                        val result = values.map { it?.value ?: "" }
                         echo(result.joinToString(","))
                     }
 
