@@ -16,6 +16,7 @@ import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.validate
+import com.github.ajalt.clikt.parameters.options.versionOption
 import com.github.ajalt.clikt.parameters.types.choice
 import kotlin.system.exitProcess
 
@@ -84,7 +85,7 @@ class Jkl : CliktCommand() {
     private val useTab by option("--use-tab").flag()
 
     private fun escapeIfNeeded(string: String?): String {
-        return if (string == null ) {
+        return if (string == null) {
             ""
         } else if (useTab) {
             string
@@ -254,4 +255,4 @@ class Jkl : CliktCommand() {
  *
  * @author digitalbot
  */
-fun main(argv: Array<String>) = Jkl().main(argv)
+fun main(argv: Array<String>) = Jkl().versionOption("1.0.0").main(argv)
