@@ -150,7 +150,7 @@ class AppTest {
     }
 
     @Test
-    fun fullArgumentsTest() {
+    fun attributeArgumentTest() {
         expect(0) {
             try {
                 Jkl().main(arrayOf("localhost:$PORT", "--", "java.lang:type=Memory", "HeapMemoryUsage"))
@@ -162,10 +162,34 @@ class AppTest {
     }
 
     @Test
-    fun fullArgumentsWithHeadersTest() {
+    fun fullArgumentsTest() {
+        expect(0) {
+            try {
+                Jkl().main(arrayOf("localhost:$PORT", "--", "java.lang:type=Memory", "HeapMemoryUsage", "max"))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
+
+    @Test
+    fun attributeArgumentsWithHeadersTest() {
         expect(0) {
             try {
                 Jkl().main(arrayOf("localhost:$PORT", "--show-header", "--", "java.lang:type=Memory", "HeapMemoryUsage"))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
+
+    @Test
+    fun fullArgumentsWithHeadersTest() {
+        expect(0) {
+            try {
+                Jkl().main(arrayOf("localhost:$PORT", "--show-header", "--", "java.lang:type=Memory", "HeapMemoryUsage", "init"))
                 0
             } catch (e: ExitException) {
                 e.state

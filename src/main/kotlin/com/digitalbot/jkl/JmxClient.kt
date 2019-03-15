@@ -140,7 +140,7 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
      * @throws JmxClientException if cannot get values.
      */
     fun getValues(beanName: String, attributeName: String, type: String?): List<AttributeValue> {
-        val result = getValues(beanName, attributeName).filter { it.type == type }
+        val result = getValues(beanName, attributeName).filter { type == null || type.isBlank() || it.type == type }
         if (result.isEmpty()) {
             throw JmxClientException("Invalid type specified ($beanName::$attributeName::$type).")
         }

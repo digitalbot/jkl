@@ -40,10 +40,15 @@ class Jkl : CliktCommand() {
     private val attribute by argument().optional()
 
     /**
+     * type name (for composite date supported attribute.)
+     */
+    private val type by argument().optional()
+
+    /**
      * requires "BEAN\tCOMMAND"
      */
     private val targets by option("-t", "--target")
-            .convert { it.replace("\\t", "\t").split("\t").let { t -> t[0] to t[1] } }
+            .convert { it.replace("\\t", "\t").split("\t") }
             .multiple()
 
     /**
@@ -80,7 +85,7 @@ class Jkl : CliktCommand() {
                     bean != null -> {
                         if (attribute != null) {
                             // show values
-                            val values = client.getValues(bean!!, attribute!!)
+                            val values = client.getValues(bean!!, attribute!!, type)
                             if (showHeader) {
                                 val headers = values.map { it.getHeader() }
                                 echo(headers.joinToString(","))
@@ -96,7 +101,7 @@ class Jkl : CliktCommand() {
 
                     // show values
                     targets.isNotEmpty() -> {
-                        val values = targets.map { client.getValues(it.first, it.second) }.flatten()
+                        val values = targets.map { client.getValues(it[0], it[1], it.getOrNull(3)) }.flatten()
                         if (showHeader) {
                             val headers = values.map { it.getHeader() }
                             echo(headers.joinToString(","))
