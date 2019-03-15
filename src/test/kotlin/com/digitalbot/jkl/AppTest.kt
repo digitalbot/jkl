@@ -77,7 +77,7 @@ class AppTest {
     // === TESTS ===
 
     @Test
-    fun testNoArgument() {
+    fun noArgumentTest() {
         expect(1) {
             try {
                 Jkl().main(emptyArray())
@@ -89,7 +89,7 @@ class AppTest {
     }
 
     @Test
-    fun testHelp() {
+    fun helpTest() {
         expect(0) {
             try {
                 Jkl().main(arrayOf("-h"))
@@ -101,7 +101,7 @@ class AppTest {
     }
 
     @Test
-    fun testInvalidHostport() {
+    fun invalidHostportTest() {
         expect(1) {
             try {
                 Jkl().main(arrayOf("hostport"))
@@ -113,7 +113,7 @@ class AppTest {
     }
 
     @Test
-    fun testInvalidPort() {
+    fun invalidPortTest() {
         expect(1) {
             try {
                 Jkl().main(arrayOf("host:foo"))
@@ -125,7 +125,7 @@ class AppTest {
     }
 
     @Test
-    fun testValidHostport() {
+    fun validHostportTest() {
         expect(0) {
             try {
                 // use ping option
@@ -138,7 +138,7 @@ class AppTest {
     }
 
     @Test
-    fun testBeanArgument() {
+    fun beanArgumentTest() {
         expect(0) {
             try {
                 Jkl().main(arrayOf("localhost:$PORT", "--", "java.lang:type=Memory"))
@@ -150,7 +150,7 @@ class AppTest {
     }
 
     @Test
-    fun testFullArguments() {
+    fun fullArgumentsTest() {
         expect(0) {
             try {
                 Jkl().main(arrayOf("localhost:$PORT", "--", "java.lang:type=Memory", "HeapMemoryUsage"))
@@ -162,7 +162,7 @@ class AppTest {
     }
 
     @Test
-    fun testFullArgumentsWithHeaders() {
+    fun fullArgumentsWithHeadersTest() {
         expect(0) {
             try {
                 Jkl().main(arrayOf("localhost:$PORT", "--show-header", "--", "java.lang:type=Memory", "HeapMemoryUsage"))
@@ -174,7 +174,7 @@ class AppTest {
     }
 
     @Test
-    fun testSimpleTarget() {
+    fun simpleTargetTest() {
         expect(0) {
             try {
                 Jkl().main(arrayOf("localhost:$PORT", "-t=java.lang:type=Memory\tHeapMemoryUsage"))
@@ -186,7 +186,7 @@ class AppTest {
     }
 
     @Test
-    fun testMultiTargetsWithHeaders() {
+    fun multiTargetsWithHeadersTest() {
         expect(0) {
             try {
                 Jkl().main(arrayOf(
@@ -203,7 +203,7 @@ class AppTest {
     }
 
     @Test
-    fun testInvalidTarget() {
+    fun invalidTargetTest() {
         expect(1) {
             try {
                 Jkl().main(arrayOf("localhost:$PORT", "--show-header", "-t=java.lang:type=Memory\tHeapMemoryUsage", "--", "java.lang:type=Memory"))
@@ -215,7 +215,7 @@ class AppTest {
     }
 
     @Test
-    fun testInvalidShowHeader() {
+    fun invalidShowHeaderTest() {
         expect(1) {
             try {
                 Jkl().main(arrayOf("localhost:$PORT", "--show-header", "--", "java.lang:type=Memory"))
