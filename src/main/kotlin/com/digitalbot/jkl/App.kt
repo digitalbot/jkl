@@ -46,9 +46,9 @@ class Jkl : CliktCommand() {
     private val type by argument().optional()
 
     /**
-     * requires "BEAN\tATTRIBUTE[\tTYPE]"
+     * requires "BEAN\tATTRIBUTE[\tTYPE][\tALIAS]"
      */
-    private val targets by option("-t", "--target", help = "Usage: \"BEAN\\tATTRIBUTE[\\tTYPE]\". This option suppress specifying error's message.")
+    private val targets by option("-t", "--target", help = "Usage: \"BEAN\\tATTRIBUTE[\\tTYPE][\\tALIAS]\". This option suppress specifying error's message.")
             .convert { it.replace("\\t", "\t").split("\t") }
             .multiple()
             .validate { target ->
@@ -115,7 +115,7 @@ class Jkl : CliktCommand() {
                     targets.isNotEmpty() -> {
                         val values = targets
                                 .map {
-                                    if (it.size == 3) {
+                                    if (it.size >= 3) {
                                         listOf(client.getValueOrNull(it[0], it[1], it[2]))
                                     } else {
                                         client.getValuesOrNull(it[0], it[1])
@@ -123,7 +123,14 @@ class Jkl : CliktCommand() {
                                 }
                                 .flatten()
                         if (showHeader) {
-                            val headers = values.map { it?.getHeader() ?: "" }
+                            val headers = targets
+                                    .mapIndexed { index, list ->
+                                        if (list.size >= 4) {
+                                            list[3]
+                                        } else {
+                                            values[index]?.getHeader() ?: ""
+                                        }
+                                    }
                             echo(headers.joinToString(","))
                         }
                         val result = values.map { it?.value ?: "" }

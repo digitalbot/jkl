@@ -261,6 +261,23 @@ class AppTest {
     }
 
     @Test
+    fun aliasedTargetsTest() {
+        expect(0) {
+            try {
+                Jkl().main(arrayOf(
+                        "localhost:$PORT",
+                        "--show-header",
+                        "-t=foo\tbar\tbaz\talias",
+                        "-t=java.lang:type=Memory\tHeapMemoryUsage\tmax\tHeapMemoryUsageMax"
+                ))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
+
+    @Test
     fun invalidShowHeaderTest() {
         expect(1) {
             try {
