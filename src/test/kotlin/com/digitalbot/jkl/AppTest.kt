@@ -123,11 +123,24 @@ class AppTest {
     }
 
     @Test
-    fun validHostportTest() {
+    fun pingTest() {
         expect(0) {
             try {
                 // use ping option
                 Jkl().main(arrayOf("localhost:$PORT", "-p"))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
+
+    @Test
+    fun validHostportTest() {
+        expect(0) {
+            try {
+                // use ping option
+                Jkl().main(arrayOf("localhost:$PORT"))
                 0
             } catch (e: ExitException) {
                 e.state
@@ -172,10 +185,10 @@ class AppTest {
     }
 
     @Test
-    fun attributeArgumentsWithHeadersTest() {
+    fun attributeArgumentsWithKeysTest() {
         expect(0) {
             try {
-                Jkl().main(arrayOf("localhost:$PORT", "--show-header", "--", "java.lang:type=Memory", "HeapMemoryUsage"))
+                Jkl().main(arrayOf("localhost:$PORT", "--show-keys", "--", "java.lang:type=Memory", "HeapMemoryUsage"))
                 0
             } catch (e: ExitException) {
                 e.state
@@ -184,10 +197,10 @@ class AppTest {
     }
 
     @Test
-    fun fullArgumentsWithHeadersTest() {
+    fun fullArgumentsWithKeysTest() {
         expect(0) {
             try {
-                Jkl().main(arrayOf("localhost:$PORT", "--show-header", "--", "java.lang:type=Memory", "HeapMemoryUsage", "init"))
+                Jkl().main(arrayOf("localhost:$PORT", "--show-keys", "--", "java.lang:type=Memory", "HeapMemoryUsage", "init"))
                 0
             } catch (e: ExitException) {
                 e.state
@@ -208,12 +221,12 @@ class AppTest {
     }
 
     @Test
-    fun multiTargetsWithHeadersTest() {
+    fun multiTargetsWithKeysTest() {
         expect(0) {
             try {
                 Jkl().main(arrayOf(
                         "localhost:$PORT",
-                        "--show-header",
+                        "--show-keys",
                         "-t=java.lang:type=Memory\tHeapMemoryUsage",
                         "-t=java.lang:type=GarbageCollector,name=G1 Young Generation\tCollectionCount"
                 ))
@@ -228,7 +241,7 @@ class AppTest {
     fun invalidArgumentAndTargetTest() {
         expect(1) {
             try {
-                Jkl().main(arrayOf("localhost:$PORT", "--show-header", "-t=java.lang:type=Memory\tHeapMemoryUsage", "--", "java.lang:type=Memory"))
+                Jkl().main(arrayOf("localhost:$PORT", "--show-keys", "-t=java.lang:type=Memory\tHeapMemoryUsage", "--", "java.lang:type=Memory"))
                 0
             } catch (e: ExitException) {
                 e.state
@@ -240,7 +253,7 @@ class AppTest {
     fun invalidTargetTest() {
         expect(1) {
             try {
-                Jkl().main(arrayOf("localhost:$PORT", "--show-header", "-t=java.lang:type=Memory"))
+                Jkl().main(arrayOf("localhost:$PORT", "--show-keys", "-t=java.lang:type=Memory"))
                 0
             } catch (e: ExitException) {
                 e.state
@@ -252,7 +265,7 @@ class AppTest {
     fun invalidMultiTargetsTest() {
         expect(0) {
             try {
-                Jkl().main(arrayOf("localhost:$PORT", "--show-header", "-t=foo\tbar", "-t=bar\tbaz"))
+                Jkl().main(arrayOf("localhost:$PORT", "--show-keys", "-t=foo\tbar", "-t=bar\tbaz"))
                 0
             } catch (e: ExitException) {
                 e.state
@@ -266,7 +279,7 @@ class AppTest {
             try {
                 Jkl().main(arrayOf(
                         "localhost:$PORT",
-                        "--show-header",
+                        "--show-keys",
                         "-t=foo\tbar\tbaz\talias",
                         "-t=java.lang:type=Memory\tHeapMemoryUsage\tmax\tHeapMemoryUsageMax"
                 ))
@@ -278,10 +291,10 @@ class AppTest {
     }
 
     @Test
-    fun invalidShowHeaderTest() {
+    fun invalidShowKeysTest() {
         expect(1) {
             try {
-                Jkl().main(arrayOf("localhost:$PORT", "--show-header", "--", "java.lang:type=Memory"))
+                Jkl().main(arrayOf("localhost:$PORT", "--show-keys", "--", "java.lang:type=Memory"))
                 0
             } catch (e: ExitException) {
                 e.state

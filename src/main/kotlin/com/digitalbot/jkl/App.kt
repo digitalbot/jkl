@@ -63,7 +63,7 @@ class Jkl : CliktCommand() {
     /**
      * Show header. Only can specify with returning value calling.
      */
-    private val showHeader by option("--show-header").flag()
+    private val showKeys by option("--show-keys").flag()
 
     /**
      * Implementation of CLI application.
@@ -74,8 +74,8 @@ class Jkl : CliktCommand() {
             echo(message = "Cannot specify BEAN or ATTRIBUTE argument with '--targets' option.", err = true)
             exitProcess(1)
         }
-        if (showHeader && (attribute == null && targets.isEmpty())) {
-            echo(message = "Cannot specify '--show-header' without attribute or '--targets' option.", err = true)
+        if (showKeys && (attribute == null && targets.isEmpty())) {
+            echo(message = "Cannot specify '--show-keys' without attribute or '--targets' option.", err = true)
             exitProcess(1)
         }
 
@@ -91,13 +91,13 @@ class Jkl : CliktCommand() {
                             // show values
                             if (type != null) {
                                 val result = client.getValue(bean!!, attribute!!, type!!)
-                                if (showHeader) {
+                                if (showKeys) {
                                     echo(result.getHeader())
                                 }
                                 echo(result.value)
                             } else {
                                 val values = client.getValues(bean!!, attribute!!)
-                                if (showHeader) {
+                                if (showKeys) {
                                     val headers = values.map { it.getHeader() }
                                     echo(headers.joinToString(","))
                                 }
@@ -107,7 +107,7 @@ class Jkl : CliktCommand() {
                         } else {
                             // show attribute list
                             val attributeNames = client.getAttributeNames(bean!!)
-                            attributeNames.forEach { echo(it) }
+                            echo(attributeNames.joinToString(","))
                         }
                     }
 
@@ -122,7 +122,7 @@ class Jkl : CliktCommand() {
                                     }
                                 }
                                 .flatten()
-                        if (showHeader) {
+                        if (showKeys) {
                             val headers = targets
                                     .mapIndexed { index, list ->
                                         if (list.size >= 4) {
@@ -139,7 +139,9 @@ class Jkl : CliktCommand() {
 
                     // show all beans
                     else -> {
-                        client.getBeanNames().forEach { echo(it) }
+                        val beans = client.getBeanNames()
+                                .map { "\"${it.replace("\"", "\\\"")}\"" }
+                        echo(beans.joinToString(","))
                     }
                 }
             }
