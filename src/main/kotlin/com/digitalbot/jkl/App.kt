@@ -119,7 +119,7 @@ class Jkl : CliktCommand() {
                     targets.isNotEmpty() -> {
                         val values = targets
                                 .map {
-                                    if (it.size >= 3) {
+                                    if (it.size >= 3 && it[2].isNotBlank()) {
                                         listOf(client.getValueOrNull(it[0], it[1], it[2]))
                                     } else {
                                         client.getValuesOrNull(it[0], it[1])
