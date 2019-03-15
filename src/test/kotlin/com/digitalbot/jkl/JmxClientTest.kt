@@ -118,4 +118,31 @@ class JmxClientTest {
             expect("used") { memoryValues[3].type }
         }
     }
+
+    @Test
+    fun getValueWithTypeTest() {
+        JmxClient(HOST, PORT).use { client ->
+            val memoryValues = client.getValues(
+                    "java.lang:type=Memory",
+                    "HeapMemoryUsage",
+                    "init"
+            )
+            expect(1) { memoryValues.size }
+            expect("java.lang:type=Memory") { memoryValues[0].beanName }
+            expect("HeapMemoryUsage") { memoryValues[0].attributeName }
+            expect("init") { memoryValues[0].type }
+        }
+    }
+
+    @Test
+    fun getValueWithInvalidTypeTest() {
+        JmxClient(HOST, PORT).use { client ->
+            val memoryValues = client.getValues(
+                    "java.lang:name=G1 Old Generation,type=GarbageCollector",
+                    "CollectionCount",
+                    "foo"
+            )
+            expect(0) { memoryValues.size }
+        }
+    }
 }
