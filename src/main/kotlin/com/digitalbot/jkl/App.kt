@@ -14,6 +14,7 @@ import com.github.ajalt.clikt.parameters.options.convert
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
+import com.github.ajalt.clikt.parameters.options.validate
 import kotlin.system.exitProcess
 
 /**
@@ -27,7 +28,7 @@ class Jkl : CliktCommand() {
      */
     private val hostport by argument("HOST:PORT")
             .convert { it.split(":").let { t -> t[0] to t[1] } }
-            .validate { require(it.second.toIntOrNull() != null) }
+            .validate { require(it.second.toIntOrNull() != null) { "Host and port must be joined by ':'." } }
 
     /**
      * bean name
@@ -45,11 +46,14 @@ class Jkl : CliktCommand() {
     private val type by argument().optional()
 
     /**
-     * requires "BEAN\tCOMMAND"
+     * requires "BEAN\tATTRIBUTE[\tTYPE]"
      */
-    private val targets by option("-t", "--target")
+    private val targets by option("-t", "--target", help = "Usage: \"BEAN\\tATTRIBUTE[\\tTYPE]\". This option suppress specifying error's message.")
             .convert { it.replace("\\t", "\t").split("\t") }
             .multiple()
+            .validate { target ->
+                require(target.find { it.size == 1 } == null) { "Target must be splittable by tab character." }
+            }
 
     /**
      * Only check client can connect to JMX Server if specified.
