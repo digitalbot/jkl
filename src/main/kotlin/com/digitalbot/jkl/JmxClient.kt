@@ -89,18 +89,14 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
     /**
      * Gets attribute values.
      *
-     * This method throw an exception if 'beanName' or 'attributeName' cannot match.
-     * But this method return an empty list if 'type' parameter cannot match.
+     * This method throws an exception if 'beanName' or 'attributeName' does not match.
      *
      * @param beanName bean name.
      * @param attributeName attribute name.
-     * @param type This parameter provides a filter to choose by 'type' if value is composite data or array.
-     *   If specified parameter does not match to type, this method return empty list.
-     *   If this parameter is specified null or blank, a filter will not apply.
      * @return values includes { beanName, attributeName, type, value }
      * @throws JmxClientException if cannot get values.
      */
-    fun getValues(beanName: String, attributeName: String, type: String? = ""): List<AttributeValue> {
+    fun getValues(beanName: String, attributeName: String): List<AttributeValue> {
         val mbsc = mbsc()
         val objectName = toObjectName(beanName)
         try {
@@ -111,14 +107,11 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
                 is CompositeDataSupport -> value.compositeType.keySet()
                         .sorted()
                         .map { AttributeValue(beanName, attributeName, it, "${value.get(it)}") }
-                        .filter { type == null || type.isBlank() || it.type == type }
                         .toList()
                 is Array<*> -> value
                         .mapIndexed { index, any -> AttributeValue(beanName, attributeName, "$index", "$any") }
-                        .filter { type == null || type.isBlank() || it.type == type }
                         .toList()
                 else -> listOf(AttributeValue(beanName, attributeName, "$value"))
-                        .filter { type == null || type.isBlank() || it.type == type }
             }
             logger.debug("GET VALUE: end.")
             return result
@@ -129,6 +122,27 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
         } catch (e: Exception) {
             throw JmxClientException("Cannot retrieve value ($beanName::$attributeName).", e)
         }
+    }
+
+    /**
+     * Gets attribute values.
+     *
+     * This method throws an exception if 'beanName', 'attributeName' or 'type' does not match.
+     *
+     * @param beanName bean name.
+     * @param attributeName attribute name.
+     * @param type This parameter provides a filter to choose by 'type' if value is composite data or array.
+     *   If specified parameter does not match to type, this method throws an exception.
+     *   If this parameter is specified null, blank or not specified, a filter will not apply.
+     * @return values includes { beanName, attributeName, type, value }
+     * @throws JmxClientException if cannot get values.
+     */
+    fun getValues(beanName: String, attributeName: String, type: String?): List<AttributeValue> {
+        val result = getValues(beanName, attributeName).filter { it.type == type }
+        if (result.isEmpty()) {
+            throw JmxClientException("Invalid type specified ($beanName::$attributeName::$type).")
+        }
+        return result
     }
 
     private fun getMBeanInfo(name: String): MBeanInfo {
@@ -183,8 +197,17 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
  *
  * This Exception is thrown by JmxClient.
  *
- * @constructor
- * @param message error message
- * @param cause error cause
+ * @author digitalbot
  */
-open class JmxClientException(message: String?, cause: Throwable?) : RuntimeException(message, cause)
+open class JmxClientException : RuntimeException {
+    /**
+     * @param message error message
+     */
+    constructor(message: String?) : super(message)
+
+    /**
+     * @param message error message
+     * @param cause error cause
+     */
+    constructor(message: String?, cause: Throwable?) : super(message, cause)
+}
