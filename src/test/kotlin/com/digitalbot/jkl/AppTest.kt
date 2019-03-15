@@ -291,6 +291,24 @@ class AppTest {
     }
 
     @Test
+    fun aliasedTargetsListTest() {
+        expect(0) {
+            try {
+                Jkl().main(arrayOf(
+                        "localhost:$PORT",
+                        "--output=list",
+                        "--show-keys",
+                        "-t=foo\tbar\tbaz\talias",
+                        "-t=java.lang:type=Memory\tHeapMemoryUsage\tmax\tHeapMemoryUsageMax"
+                ))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
+
+    @Test
     fun invalidShowKeysTest() {
         expect(1) {
             try {

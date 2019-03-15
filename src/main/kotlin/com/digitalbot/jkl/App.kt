@@ -11,10 +11,12 @@ import com.github.ajalt.clikt.parameters.arguments.convert
 import com.github.ajalt.clikt.parameters.arguments.optional
 import com.github.ajalt.clikt.parameters.arguments.validate
 import com.github.ajalt.clikt.parameters.options.convert
+import com.github.ajalt.clikt.parameters.options.default
 import com.github.ajalt.clikt.parameters.options.flag
 import com.github.ajalt.clikt.parameters.options.multiple
 import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.validate
+import com.github.ajalt.clikt.parameters.types.choice
 import kotlin.system.exitProcess
 
 /**
@@ -70,6 +72,30 @@ class Jkl : CliktCommand() {
     private val showKeys by option("--show-keys").flag()
 
     /**
+     * Output format option for showing values.
+     */
+    private val output by option("-o", "--output")
+            .choice("csv", "list")
+            .default("csv")
+
+    /**
+     * Use tab character for csv output format.
+     */
+    private val useTab by option("--use-tab").flag()
+
+    private fun escapeIfNeeded(string: String?): String {
+        return if (string == null ) {
+            ""
+        } else if (useTab) {
+            string
+        } else if (string.contains(",") || string.contains("\"") || string.contains(" ")) {
+            "\"${string.replace("\"", "\\\"")}\""
+        } else {
+            string
+        }
+    }
+
+    /**
      * Implementation of CLI application.
      */
     override fun run() {
@@ -83,6 +109,8 @@ class Jkl : CliktCommand() {
             exitProcess(1)
         }
 
+        val csvDelimiter = if (useTab) "\t" else ","
+
         try {
             JmxClient(hostport.first, hostport.second.toInt()).use { client ->
                 when {
@@ -95,23 +123,57 @@ class Jkl : CliktCommand() {
                             // show values
                             if (type != null) {
                                 val result = client.getValue(bean!!, attribute!!, type!!)
-                                if (showKeys) {
-                                    echo(result.getHeader())
+                                when (output) {
+                                    "csv" -> {
+                                        if (showKeys) {
+                                            echo(escapeIfNeeded(result.getHeader()))
+                                        }
+                                        echo(escapeIfNeeded(result.value))
+                                    }
+                                    "list" -> {
+                                        if (showKeys) {
+                                            echo("${result.getHeader()}\t${result.value}")
+                                        } else {
+                                            echo(result.value)
+                                        }
+                                    }
+                                    else -> true
                                 }
-                                echo(result.value)
                             } else {
                                 val values = client.getValues(bean!!, attribute!!)
-                                if (showKeys) {
-                                    val headers = values.map { it.getHeader() }
-                                    echo(headers.joinToString(","))
+                                when (output) {
+                                    "csv" -> {
+                                        if (showKeys) {
+                                            val headers = values.map { escapeIfNeeded(it.getHeader()) }
+                                            echo(headers.joinToString(csvDelimiter))
+                                        }
+                                        val result = values.map { escapeIfNeeded(it.value) }
+                                        echo(result.joinToString(csvDelimiter))
+                                    }
+                                    "list" -> {
+                                        if (showKeys) {
+                                            values.forEach {
+                                                echo("${it.getHeader()}\t${it.value}")
+                                            }
+                                        } else {
+                                            values.forEach { echo(it.value) }
+                                        }
+                                    }
+                                    else -> true
                                 }
-                                val result = values.map { it.value }
-                                echo(result.joinToString(","))
                             }
                         } else {
                             // show attribute list
                             val attributeNames = client.getAttributeNames(bean!!)
-                            echo(attributeNames.joinToString(","))
+                            when (output) {
+                                "csv" -> {
+                                    echo(attributeNames.joinToString(csvDelimiter))
+                                }
+                                "list" -> {
+                                    attributeNames.forEach { echo(it) }
+                                }
+                                else -> true
+                            }
                         }
                     }
 
@@ -126,26 +188,54 @@ class Jkl : CliktCommand() {
                                     }
                                 }
                                 .flatten()
-                        if (showKeys) {
-                            val headers = targets
-                                    .mapIndexed { index, list ->
-                                        if (list.size >= 4) {
-                                            list[3]
+                        when (output) {
+                            "csv" -> {
+                                if (showKeys) {
+                                    val headers = targets
+                                            .mapIndexed { index, list ->
+                                                if (list.size >= 4) {
+                                                    list[3]
+                                                } else {
+                                                    escapeIfNeeded(values[index]?.getHeader())
+                                                }
+                                            }
+                                    echo(headers.joinToString(csvDelimiter))
+                                }
+                                val result = values.map { escapeIfNeeded(it?.value) }
+                                echo(result.joinToString(csvDelimiter))
+                            }
+                            "list" -> {
+                                if (showKeys) {
+                                    values.forEachIndexed { index, value ->
+                                        val header = if (targets[index].size >= 4) {
+                                            targets[index][3]
                                         } else {
-                                            values[index]?.getHeader() ?: ""
+                                            value?.getHeader() ?: ""
                                         }
+                                        val v = value?.value ?: ""
+                                        echo("$header\t$v")
                                     }
-                            echo(headers.joinToString(","))
+                                } else {
+                                    values.forEach { echo(it?.value ?: "") }
+                                }
+                            }
+                            else -> true
                         }
-                        val result = values.map { it?.value ?: "" }
-                        echo(result.joinToString(","))
                     }
 
                     // show all beans
                     else -> {
-                        val beans = client.getBeanNames()
-                                .map { "\"${it.replace("\"", "\\\"")}\"" }
-                        echo(beans.joinToString(","))
+                        when (output) {
+                            "csv" -> {
+                                val beans = client.getBeanNames().map(this::escapeIfNeeded)
+                                echo(beans.joinToString(csvDelimiter))
+                            }
+                            "list" -> {
+                                val beans = client.getBeanNames()
+                                beans.forEach { echo(it) }
+                            }
+                            else -> true
+                        }
                     }
                 }
             }

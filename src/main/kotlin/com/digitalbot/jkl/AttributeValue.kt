@@ -30,6 +30,6 @@ data class AttributeValue(val beanName: String, val attributeName: String, val t
      */
     fun getHeader(): String {
         val str = "$beanName::$attributeName"
-        return if (type == null) "\"$str\"" else "\"$str::$type\""
+        return if (type == null) str else "$str::$type"
     }
 }
