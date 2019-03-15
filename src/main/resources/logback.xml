@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE logback>
+<configuration>
+    <appender name="CLIENT_LOG" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d [%t] %p %c{36} - %m%n</pattern>
+            <charset>UTF8</charset>
+        </encoder>
+    </appender>
+</configuration>
