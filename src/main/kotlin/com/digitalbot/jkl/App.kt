@@ -18,6 +18,7 @@ import com.github.ajalt.clikt.parameters.options.option
 import com.github.ajalt.clikt.parameters.options.validate
 import com.github.ajalt.clikt.parameters.options.versionOption
 import com.github.ajalt.clikt.parameters.types.choice
+import com.github.ajalt.clikt.parameters.types.file
 import kotlin.system.exitProcess
 
 /**
@@ -62,6 +63,8 @@ class Jkl : CliktCommand() {
                 require(target.find { it.size == 1 } == null) { "Target must be splittable by tab character." }
             }
 
+    private val file by option("-f", "--file").file(exists = true, folderOkay = false, readable = true)
+
     /**
      * Only check client can connect to JMX Server if specified.
      */
@@ -101,12 +104,20 @@ class Jkl : CliktCommand() {
      */
     override fun run() {
         // validate. correlation check.
-        if ((attribute ?: bean) != null && targets.isNotEmpty()) {
-            echo(message = "Cannot specify BEAN or ATTRIBUTE argument with '--targets' option.", err = true)
+        if (targets.isNotEmpty() && file != null) {
+            echo(message = "Cannot specify '--targets' option and '--file' option together.", err = true)
             exitProcess(1)
         }
-        if (showKeys && (attribute == null && targets.isEmpty())) {
-            echo(message = "Cannot specify '--show-keys' without attribute or '--targets' option.", err = true)
+        val outputTargets = file?.useLines { seq ->
+            seq.map { it.replace("\\t", "\t").split("\t") }.toList()
+        } ?: targets
+
+        if ((attribute ?: bean) != null && outputTargets.isNotEmpty()) {
+            echo(message = "Cannot specify BEAN or ATTRIBUTE argument with '--targets' or '--file' option.", err = true)
+            exitProcess(1)
+        }
+        if (showKeys && (attribute == null && outputTargets.isEmpty())) {
+            echo(message = "Cannot specify '--show-keys' without attribute or '--targets' or '--file' option.", err = true)
             exitProcess(1)
         }
 
@@ -179,8 +190,8 @@ class Jkl : CliktCommand() {
                     }
 
                     // show values
-                    targets.isNotEmpty() -> {
-                        val values = targets
+                    outputTargets.isNotEmpty() -> {
+                        val values = outputTargets
                                 .map {
                                     if (it.size >= 3 && it[2].isNotBlank()) {
                                         listOf(client.getValueOrNull(it[0], it[1], it[2]))
@@ -192,7 +203,7 @@ class Jkl : CliktCommand() {
                         when (output) {
                             "csv" -> {
                                 if (showKeys) {
-                                    val headers = targets
+                                    val headers = outputTargets
                                             .mapIndexed { index, list ->
                                                 if (list.size >= 4) {
                                                     list[3]
@@ -208,8 +219,8 @@ class Jkl : CliktCommand() {
                             "list" -> {
                                 if (showKeys) {
                                     values.forEachIndexed { index, value ->
-                                        val header = if (targets[index].size >= 4) {
-                                            targets[index][3]
+                                        val header = if (outputTargets[index].size >= 4) {
+                                            outputTargets[index][3]
                                         } else {
                                             value?.getHeader() ?: ""
                                         }
