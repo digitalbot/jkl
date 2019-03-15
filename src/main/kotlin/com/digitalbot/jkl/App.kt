@@ -48,7 +48,11 @@ class Jkl : CliktCommand() {
     /**
      * requires "BEAN\tATTRIBUTE[\tTYPE][\tALIAS]"
      */
-    private val targets by option("-t", "--target", help = "Usage: \"BEAN\\tATTRIBUTE[\\tTYPE][\\tALIAS]\". This option suppress specifying error's message.")
+    private val targets by option("-t", "--target", help = """
+        Usage: \"BEAN\\tATTRIBUTE[\\tTYPE][\\tALIAS]\".
+        This option suppress specifying error's message.
+        An alias cannot contains double quote and comma.
+        """)
             .convert { it.replace("\\t", "\t").split("\t") }
             .multiple()
             .validate { target ->
