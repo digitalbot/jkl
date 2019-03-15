@@ -120,7 +120,16 @@ class JmxClientTest {
     }
 
     @Test
-    fun getValueWithTypeTest() {
+    fun getValuesOrNullTest() {
+        JmxClient(HOST, PORT).use { client ->
+            val noValues = client.getValuesOrNull("foo", "bar")
+            expect(1) { noValues.size }
+            expect(0) { noValues.filter { it != null }.size }
+        }
+    }
+
+    @Test
+    fun getValuesWithTypeTest() {
         JmxClient(HOST, PORT).use { client ->
             val memoryValues = client.getValues(
                     "java.lang:type=Memory",
@@ -135,14 +144,32 @@ class JmxClientTest {
     }
 
     @Test
-    fun getValueWithInvalidTypeTest() {
+    fun getValuesWithInvalidTypeTest() {
+        try {
+            JmxClient(HOST, PORT).use { client ->
+                client.getValues(
+                        "java.lang:name=G1 Old Generation,type=GarbageCollector",
+                        "CollectionCount",
+                        "foo"
+                )
+            }
+        } catch (e: JmxClientException) {
+            expect("Invalid type specified (java.lang:name=G1 Old Generation,type=GarbageCollector::CollectionCount::foo).") {
+                e.message
+            }
+        }
+    }
+
+    @Test
+    fun getValuesOrNullWithInvalidTypeTest() {
         JmxClient(HOST, PORT).use { client ->
-            val memoryValues = client.getValues(
+            val noValues = client.getValuesOrNull(
                     "java.lang:name=G1 Old Generation,type=GarbageCollector",
                     "CollectionCount",
                     "foo"
             )
-            expect(0) { memoryValues.size }
+            expect(1) { noValues.size }
+            expect(0) { noValues.filter { it != null }.size }
         }
     }
 }

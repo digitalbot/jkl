@@ -145,6 +145,43 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
         return result
     }
 
+    /**
+     * Gets attribute values.
+     *
+     * This method returns nullable elements list. (but list is non nullable.)
+     *
+     * @param beanName bean name.
+     * @param attributeName attribute name.
+     * @return values includes { beanName, attributeName, type, value }
+     */
+    fun getValuesOrNull(beanName: String, attributeName: String): List<AttributeValue?> {
+        return try {
+            getValues(beanName, attributeName)
+        } catch (e: Exception) {
+            listOf(null)
+        }
+    }
+
+    /**
+     * Gets attribute values.
+     *
+     * This method returns nullable elements list. (but list is non nullable.)
+     *
+     * @param beanName bean name.
+     * @param attributeName attribute name.
+     * @param type This parameter provides a filter to choose by 'type' if value is composite data or array.
+     *   If specified parameter does not match to type, this method returns null element list.
+     *   If this parameter is specified null, blank or not specified, a filter will not be applied.
+     * @return values includes { beanName, attributeName, type, value }
+     */
+    fun getValuesOrNull(beanName: String, attributeName: String, type: String?): List<AttributeValue?> {
+        return try {
+            getValues(beanName, attributeName, type)
+        } catch (e: Exception) {
+            listOf(null)
+        }
+    }
+
     private fun getMBeanInfo(name: String): MBeanInfo {
         val mbsc = mbsc()
         val objectName = toObjectName(name)
