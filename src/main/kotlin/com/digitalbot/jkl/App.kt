@@ -26,7 +26,7 @@ class Jkl : CliktCommand() {
      * requires valid jmx rmi "host:port"
      */
     private val hostport by argument("HOST:PORT")
-            .convert { it.split(":").let { t -> Pair(t[0], t[1]) } }
+            .convert { it.split(":").let { t -> t[0] to t[1] } }
             .validate { require(it.second.toIntOrNull() != null) }
 
     /**
@@ -43,7 +43,7 @@ class Jkl : CliktCommand() {
      * requires "BEAN\tCOMMAND"
      */
     private val targets by option("-t", "--target")
-            .convert { it.replace("\\t", "\t").split("\t").let { t -> Pair(t[0], t[1]) } }
+            .convert { it.replace("\\t", "\t").split("\t").let { t -> t[0] to t[1] } }
             .multiple()
 
     /**

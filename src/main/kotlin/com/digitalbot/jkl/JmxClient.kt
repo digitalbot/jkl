@@ -18,6 +18,8 @@ import javax.management.remote.JMXServiceURL
  *
  * This class can connect to JMX Service.
  *
+ * @author digitalbot
+ *
  * @constructor Primary.
  *
  * This Object requires `host` and `port`.
@@ -133,7 +135,7 @@ open class JmxClient(val host: String, val port: Int) : AutoCloseable {
      * @param attributeName attribute name.
      * @param type This parameter provides a filter to choose by 'type' if value is composite data or array.
      *   If specified parameter does not match to type, this method throws an exception.
-     *   If this parameter is specified null, blank or not specified, a filter will not apply.
+     *   If this parameter is specified null, blank or not specified, a filter will not be applied.
      * @return values includes { beanName, attributeName, type, value }
      * @throws JmxClientException if cannot get values.
      */
