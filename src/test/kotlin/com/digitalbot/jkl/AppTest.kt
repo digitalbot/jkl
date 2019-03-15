@@ -35,8 +35,8 @@ class AppTest {
         private const val PORT = 10001
 
         /** test jmx server */
-        private var jmxServer: JMXConnectorServer? = null
-        private var registry: Registry? = null
+        private lateinit var jmxServer: JMXConnectorServer
+        private lateinit var registry: Registry
 
         /**
          * Set up trapping System.exit(?) and JMX Server.
@@ -54,7 +54,7 @@ class AppTest {
                     JMXServiceURL(location),
                     null,
                     ManagementFactory.getPlatformMBeanServer())
-            jmxServer?.start()
+            jmxServer.start()
 
             println("jmx server is started.")
         }
@@ -66,10 +66,8 @@ class AppTest {
         @JvmStatic
         fun after() {
             println("stop jmx server.")
-            jmxServer?.stop()
-            if (registry != null) {
-                UnicastRemoteObject.unexportObject(registry, true)
-            }
+            jmxServer.stop()
+            UnicastRemoteObject.unexportObject(registry, true)
             println("jmx server is stopped.")
         }
     }
