@@ -146,13 +146,13 @@ class JmxClientTest {
         try {
             JmxClient(HOST, PORT).use { client ->
                 client.getValue(
-                        "java.lang:name=G1 Old Generation,type=GarbageCollector",
-                        "CollectionCount",
+                        "java.lang:type=Memory",
+                        "HeapMemoryUsage",
                         "foo"
                 )
             }
         } catch (e: JmxClientException) {
-            expect("Invalid type specified (java.lang:name=G1 Old Generation,type=GarbageCollector::CollectionCount::foo).") {
+            expect("Invalid type specified (java.lang:type=Memory::HeapMemoryUsage::foo).") {
                 e.message
             }
         }
