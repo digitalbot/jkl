@@ -319,4 +319,24 @@ class AppTest {
             }
         }
     }
+
+    @Test
+    fun fileTargetTest() {
+        val tmpTargetFile = createTempFile("target")
+        if (tmpTargetFile.exists()) {
+             tmpTargetFile.delete()
+        }
+        tmpTargetFile.createNewFile()
+        tmpTargetFile.appendText("java.lang:type=Memory\tHeapMemoryUsage\tmax\tHeapMemoryUsageMax\n")
+        tmpTargetFile.appendText("java.lang:type=Memory\tNonHeapMemoryUsage\tinit\tNonHeapMemoryUsageInit\n")
+        tmpTargetFile.appendText("java.lang:name=G1 Old Generation,type=GarbageCollector\tCollectionCount\t\tG1OldGCCount")
+        expect(0) {
+            try {
+                Jkl().main(arrayOf("localhost:$PORT", "--show-keys", "-f=${tmpTargetFile.path}"))
+                0
+            } catch (e: ExitException) {
+                e.state
+            }
+        }
+    }
 }
