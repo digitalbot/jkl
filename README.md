@@ -60,7 +60,7 @@ Use VALUE as target. This can be used to specify multiple search retrieve values
 
 Format: `BEAN\tATTRIBUTE[\tTYPE][\tALIAS]`
 
-Parameters TYPE and ALIAS is optional. ALIAS is using for `--show-keys` option.
+Parameters TYPE and ALIAS are optional. ALIAS is using for `--show-keys` option.
 
 ### -f, --file FILE
 Use FILE contens as target. See more `--target` option.
