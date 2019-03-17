@@ -26,10 +26,17 @@ SYNOPSIS
 ```
 $ java -jar jkl-1.0.0-all.jar [OPTIONS] HOST:PORT [BEAN] [ATTRIBUTE] [TYPE]
 ```
+
 #### With [zip](https://github.com/digitalbot/jkl/releases/download/1.0.0/jkl-1.0.0-zip)
 ```
 $ jkl [OPTIONS] HOST:PORT [BEAN] [ATTRIBUTE] [TYPE]
 ```
+
+#### With docker
+```
+$ docker run -i --rm digitalbot/jkl jkl [OPTIONS] HOST:PORT [BEAN] [ATTRIBUTE] [TYPE]
+```
+
 
 ### INSTALLATION
 #### With java command
@@ -37,6 +44,10 @@ Go to [releases page](https://github.com/digitalbot/jkl/releases/), find the ver
 
 #### Like executable script
 Go to [releases page](https://github.com/digitalbot/jkl/releases/), find the version you want, and download **zip** file. Unpack the zip file, and you execute unpacked command file.
+
+
+#### Docker
+
 
 #### Single binary
 NOT IMPLEMENTED...
