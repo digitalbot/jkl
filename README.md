@@ -1,7 +1,7 @@
 JKL
 =====
 
-[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE)
+[![MIT License](http://img.shields.io/badge/license-MIT-blue.svg?style=flat)](LICENSE.txt)
 [![CircleCI](https://circleci.com/gh/digitalbot/jkl.svg?style=svg)](https://circleci.com/gh/digitalbot/jkl)
 
 NAME
