@@ -27,7 +27,7 @@ dependencies {
 
 application {
     mainClassName = "com.digitalbot.jkl.AppKt"
-    version = "1.0.0"
+    version = "1.1.0"
 }
 
 tasks.withType<KotlinCompile> {

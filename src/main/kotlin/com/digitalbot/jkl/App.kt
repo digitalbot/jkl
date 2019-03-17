@@ -266,4 +266,4 @@ class Jkl : CliktCommand() {
  *
  * @author digitalbot
  */
-fun main(argv: Array<String>) = Jkl().versionOption("1.0.0").main(argv)
+fun main(argv: Array<String>) = Jkl().versionOption("1.1.0").main(argv)
