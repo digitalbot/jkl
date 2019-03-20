@@ -109,7 +109,7 @@ class Jkl : CliktCommand() {
             exitProcess(1)
         }
         val outputTargets = file?.useLines { seq ->
-            seq.map { it.replace("\\t", "\t").split("\t") }.toList()
+            seq.filter(String::isNotBlank).map { it.replace("\\t", "\t").split("\t") }.toList()
         } ?: targets
 
         if ((attribute ?: bean) != null && outputTargets.isNotEmpty()) {
@@ -266,4 +266,4 @@ class Jkl : CliktCommand() {
  *
  * @author digitalbot
  */
-fun main(argv: Array<String>) = Jkl().versionOption("1.1.0").main(argv)
+fun main(argv: Array<String>) = Jkl().versionOption("1.1.1").main(argv)
